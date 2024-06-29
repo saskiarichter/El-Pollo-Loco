@@ -50,4 +50,40 @@ const level1 = new Level(
     new Coin('img/8_coin/coin_1.png', 690, 180),
     new Coin('img/8_coin/coin_1.png', 730, 180),
     new Coin('img/8_coin/coin_2.png', 1200, 330),
-]);
+],
+    new Statusbar([
+        'img/7_statusbars/1_statusbar/2_statusbar_health/orange/0.png',
+        'img/7_statusbars/1_statusbar/2_statusbar_health/orange/20.png',
+        'img/7_statusbars/1_statusbar/2_statusbar_health/orange/40.png',
+        'img/7_statusbars/1_statusbar/2_statusbar_health/orange/60.png',
+        'img/7_statusbars/1_statusbar/2_statusbar_health/orange/80.png',
+        'img/7_statusbars/1_statusbar/2_statusbar_health/orange/100.png',
+    ], 50, 30)
+,
+    new Statusbar([
+        'img/7_statusbars/1_statusbar/1_statusbar_coin/orange/0.png',
+        'img/7_statusbars/1_statusbar/1_statusbar_coin/orange/20.png',
+        'img/7_statusbars/1_statusbar/1_statusbar_coin/orange/40.png',
+        'img/7_statusbars/1_statusbar/1_statusbar_coin/orange/60.png',
+        'img/7_statusbars/1_statusbar/1_statusbar_coin/orange/80.png',
+        'img/7_statusbars/1_statusbar/1_statusbar_coin/orange/100.png',
+    ], 50, 65)
+,
+new Statusbar([
+    'img/7_statusbars/1_statusbar/3_statusbar_bottle/orange/0.png',
+    'img/7_statusbars/1_statusbar/3_statusbar_bottle/orange/20.png',
+    'img/7_statusbars/1_statusbar/3_statusbar_bottle/orange/40.png',
+    'img/7_statusbars/1_statusbar/3_statusbar_bottle/orange/60.png',
+    'img/7_statusbars/1_statusbar/3_statusbar_bottle/orange/80.png',
+    'img/7_statusbars/1_statusbar/3_statusbar_bottle/orange/100.png',
+], 50, 100)
+,
+    new Statusbar([
+        'img/7_statusbars/2_statusbar_endboss/orange/orange0.png',
+        'img/7_statusbars/2_statusbar_endboss/orange/orange20.png',
+        'img/7_statusbars/2_statusbar_endboss/orange/orange40.png',
+        'img/7_statusbars/2_statusbar_endboss/orange/orange60.png',
+        'img/7_statusbars/2_statusbar_endboss/orange/orange80.png',
+        'img/7_statusbars/2_statusbar_endboss/orange/orange100.png',
+    ], 520, 35)
+);

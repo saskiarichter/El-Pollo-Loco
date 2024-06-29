@@ -4,6 +4,7 @@ class World {
     keyboard;
     camera_x = 0;
     character = new Character();
+    throwableObjects = [new ThrowableObject()]
     level = level1;
 
     constructor(canvas, keyboard) {
@@ -12,7 +13,6 @@ class World {
         this.keyboard = keyboard;
         this.draw();
         this.setWorld();
-        this.checkCollisions(this.level.enemies);
     }
 
     setWorld() {
@@ -23,16 +23,22 @@ class World {
         this.emptyCanvas();
 
         this.ctx.translate(this.camera_x, 0);
-
+        // -- space for movable objects ---
         this.drawObjectsOnCanvas(this.level.backgrounds);
-        this.drawObjectsOnCanvas(this.level.bottles);
-        this.drawObjectsOnCanvas(this.level.coins);
         this.drawObjectsOnCanvas(this.level.clouds);
-
+        this.drawObjectsOnCanvas(this.level.bottles);
+        this.drawObjectsOnCanvas(this.throwableObjects);
+        this.drawObjectsOnCanvas(this.level.coins);
         this.drawOnCanvas(this.character);
         this.drawObjectsOnCanvas(this.level.enemies);
-
         this.ctx.translate(-this.camera_x, 0);
+
+        // -- space for fixed objects ---
+        this.drawOnCanvas(this.level.lifebar);
+        this.drawOnCanvas(this.level.coinbar);
+        this.drawOnCanvas(this.level.endbossbar);
+        this.drawOnCanvas(this.level.bottlebar);
+        
 
         this.drawAgain();
     }
@@ -77,16 +83,4 @@ class World {
             self.draw();
         });
     }
-
-    checkCollisions(array){
-        setInterval(() => {
-            array.forEach((object)=> {
-                if (this.character.isColliding(object)) {
-                    this.character.animateImages(this.character.IMAGES_HURTING);
-                    this.character.hurting_sound.play();
-                }
-            })
-        }, 110);
-    }
-    
 }

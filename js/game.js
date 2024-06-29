@@ -16,6 +16,8 @@ window.addEventListener('keydown', (e) => {
         keyboard.LEFT = true;
     } else if (e.code == 'ArrowUp') {
         keyboard.UP = true;
+    }else if (e.code == 'KeyD') {
+        keyboard.D = true;
     }
 });
 
@@ -28,5 +30,7 @@ window.addEventListener('keyup', (e) => {
         keyboard.LEFT = false;
     } else if (e.code == 'ArrowUp') {
         keyboard.UP = false;
+    }else if (e.code == 'KeyD') {
+        keyboard.D = false;
     }
 });

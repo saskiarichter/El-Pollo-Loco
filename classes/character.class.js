@@ -1,9 +1,11 @@
 class Character extends MovableObject {
     world;
+    level = level1;
     x = 0;
     y = 30;
     width = 110;
     height = 200;
+    speed = 4;
     IMAGES_STANDING = [
         'img/2_character_pepe/1_idle/idle/I-1.png',
         'img/2_character_pepe/1_idle/idle/I-2.png',
@@ -61,10 +63,16 @@ class Character extends MovableObject {
         'img/2_character_pepe/5_dead/D-56.png',
         'img/2_character_pepe/5_dead/D-57.png',
     ];
-    speed = 4;
     walking_sound = new Audio('audio/running.mp3');
     jumping_sound = new Audio('audio/jumping.mp3');
     hurting_sound = new Audio('audio/hurting.mp3');
+    dying_sound = new Audio('audio/dying.mp3');
+    offset = {
+        top: 90,
+        right: 30,
+        bottom: 10,
+        left: 20,
+    }
 
 
     constructor() {
@@ -76,6 +84,7 @@ class Character extends MovableObject {
         this.loadImages(this.IMAGES_HURTING);
         this.loadImages(this.IMAGES_DYING);
         this.controlCharacter();
+        this.checkCollisions();
     }
 
     controlCharacter() {
@@ -128,5 +137,49 @@ class Character extends MovableObject {
                 this.jumping_sound.play();
             }
         }, 1000 / 60);
+    }
+
+    checkCollisions() {
+        setInterval(() => {
+            this.collideEnemy();
+            this.collideCoin();
+            this.collideBottle();
+        }, 110);
+        this.animateCollision();
+    }
+
+    collideEnemy() {
+        this.level.enemies.forEach((enemy) => {
+            if (this.isColliding(enemy)) {
+                if (this.energy > 0) {
+                    if (!this.isHurt()) {
+                        this.energy -= 20;
+                        this.level.lifebar.setPercentage(this.energy);
+                        this.lastHit = new Date().getTime();
+                    }
+                }
+            }
+        })
+    }
+
+    collideCoin(){
+
+    }
+
+    collideBottle(){
+
+    }
+
+    animateCollision() {
+        setInterval(() => {
+            if (this.isHurt()) {
+                this.animateImages(this.IMAGES_HURTING);
+                this.hurting_sound.play();
+            }
+            if (this.isDead() && this.energy == 0) {
+                this.animateImages(this.IMAGES_DYING);
+                this.dying_sound.play();
+            }
+        }, 110);
     }
 }
