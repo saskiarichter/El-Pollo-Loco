@@ -3,8 +3,8 @@ class MovableObject extends DrawableObject{
     otherDirection = false;
     speedY = 0;
     accelaration = 1;
-    energy = 100;
     lastHit = 0;
+    lastCollect = 0;
 
     moveRight() {
         this.x += this.speed;
@@ -36,6 +36,12 @@ class MovableObject extends DrawableObject{
         this.y + this.height - this.offset.bottom > object.y + object.offset.top &&
         this.x + this.offset.left < object.x + object.width - object.offset.right &&
         this.y + this.offset.top < object.y + object.height - object.offset.bottom;
+    }
+
+    isHit(){
+        let timepassed = new Date().getTime() - this.lastCollect;
+        timepassed = timepassed / 1000; // Differenz in s
+        return timepassed < 0.5;
     }
 
     isHurt(){

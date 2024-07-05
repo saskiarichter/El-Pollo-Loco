@@ -6,6 +6,9 @@ class Character extends MovableObject {
     width = 110;
     height = 200;
     speed = 4;
+    energy = 100;
+    coinstatus = 0;
+    bottlestatus = 0;
     IMAGES_STANDING = [
         'img/2_character_pepe/1_idle/idle/I-1.png',
         'img/2_character_pepe/1_idle/idle/I-2.png',
@@ -67,6 +70,9 @@ class Character extends MovableObject {
     jumping_sound = new Audio('audio/jumping.mp3');
     hurting_sound = new Audio('audio/hurting.mp3');
     dying_sound = new Audio('audio/dying.mp3');
+    coin_sound = new Audio('audio/coin.mp3');
+    collect_sound = new Audio('audio/collecting.mp3');
+    attack_sound = new Audio('audio/attack.mp3');
     offset = {
         top: 90,
         right: 30,
@@ -92,6 +98,7 @@ class Character extends MovableObject {
         this.walk();
         this.animateJump();
         this.jump();
+        this.throwBottle();
     }
 
     animateWalk() {
@@ -100,7 +107,11 @@ class Character extends MovableObject {
                 this.animateImages(this.IMAGES_WALKING);
                 this.walking_sound.play();
             } else {
-                this.animateImages(this.IMAGES_STANDING);
+                if (this.energy > 0) {
+                    this.animateImages(this.IMAGES_STANDING);
+                } else {
+                    this.loadImage('img/2_character_pepe/5_dead/D-57.png');
+                }
                 this.walking_sound.pause();
             }
         }, 110);
@@ -139,9 +150,22 @@ class Character extends MovableObject {
         }, 1000 / 60);
     }
 
+    throwBottle() {
+        setInterval(() => {
+            if (this.world.keyboard.D && this.bottlestatus > 0) {
+                let bottle = new ThrowableObject(this.x + 50, this.y + 100);
+                this.world.throwableObjects.push(bottle);
+                this.attack_sound.play();
+                this.bottlestatus -= 20;
+                this.level.bottlebar.setPercentage(this.bottlestatus);
+            }
+        }, 200);
+    }
+
     checkCollisions() {
         setInterval(() => {
             this.collideEnemy();
+            this.collideEndboss();
             this.collideCoin();
             this.collideBottle();
         }, 110);
@@ -162,12 +186,44 @@ class Character extends MovableObject {
         })
     }
 
-    collideCoin(){
-
+    collideEndboss(){
+        if (this.isColliding(this.world.endboss)) {
+            if (this.energy > 0) {
+                if (!this.isHurt()) {
+                    this.energy -= 20;
+                    this.level.lifebar.setPercentage(this.energy);
+                    this.lastHit = new Date().getTime();
+                }
+            }
+        }
     }
 
-    collideBottle(){
+    collideCoin() {
+        let coins = this.level.coins;
+        for (let i = 0; i < coins.length; i++) {
+            const coin = coins[i];
+            if (this.isColliding(coin) && this.coinstatus < 100 && !this.isHit()) {
+                this.coinstatus += 20;
+                this.level.coinbar.setPercentage(this.coinstatus);
+                this.lastCollect = new Date().getTime();
+                this.coin_sound.play();
+                coins.splice(i, 1);
+            }
+        }
+    }
 
+    collideBottle() {
+        let bottles = this.level.bottles;
+        for (let i = 0; i < bottles.length; i++) {
+            const bottle = bottles[i];
+            if (this.isColliding(bottle) && this.bottlestatus < 100 && !this.isHit()) {
+                this.bottlestatus += 20;
+                this.level.bottlebar.setPercentage(this.bottlestatus);
+                this.lastCollect = new Date().getTime();
+                this.collect_sound.play();
+                bottles.splice(i, 1);
+            }
+        }
     }
 
     animateCollision() {

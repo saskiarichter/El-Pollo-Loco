@@ -5,7 +5,6 @@ const level1 = new Level(
         new Chicken(),
         new Chicken(),
         new SmallChicken(),
-        new Endboss(),
     ], [
     new Cloud('img/5_background/layers/4_clouds/1.png', -400),
     new Cloud('img/5_background/layers/4_clouds/1.png', 0),
@@ -58,7 +57,7 @@ const level1 = new Level(
         'img/7_statusbars/1_statusbar/2_statusbar_health/orange/60.png',
         'img/7_statusbars/1_statusbar/2_statusbar_health/orange/80.png',
         'img/7_statusbars/1_statusbar/2_statusbar_health/orange/100.png',
-    ], 50, 30)
+    ], 50, 30, 100)
 ,
     new Statusbar([
         'img/7_statusbars/1_statusbar/1_statusbar_coin/orange/0.png',
@@ -67,7 +66,7 @@ const level1 = new Level(
         'img/7_statusbars/1_statusbar/1_statusbar_coin/orange/60.png',
         'img/7_statusbars/1_statusbar/1_statusbar_coin/orange/80.png',
         'img/7_statusbars/1_statusbar/1_statusbar_coin/orange/100.png',
-    ], 50, 65)
+    ], 50, 65, 0)
 ,
 new Statusbar([
     'img/7_statusbars/1_statusbar/3_statusbar_bottle/orange/0.png',
@@ -76,7 +75,7 @@ new Statusbar([
     'img/7_statusbars/1_statusbar/3_statusbar_bottle/orange/60.png',
     'img/7_statusbars/1_statusbar/3_statusbar_bottle/orange/80.png',
     'img/7_statusbars/1_statusbar/3_statusbar_bottle/orange/100.png',
-], 50, 100)
+], 50, 100, 0)
 ,
     new Statusbar([
         'img/7_statusbars/2_statusbar_endboss/orange/orange0.png',
@@ -85,5 +84,5 @@ new Statusbar([
         'img/7_statusbars/2_statusbar_endboss/orange/orange60.png',
         'img/7_statusbars/2_statusbar_endboss/orange/orange80.png',
         'img/7_statusbars/2_statusbar_endboss/orange/orange100.png',
-    ], 520, 35)
+    ], 520, 35, 100)
 );

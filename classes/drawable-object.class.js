@@ -7,10 +7,10 @@ class DrawableObject {
     imageCache = {};
     currentImage = 0;
     offset = {
-        top: 0,
-        right: 0,
-        bottom: 0,
-        left: 0,
+        top: 60,
+        right: 40,
+        bottom: 30,
+        left: 50,
     }
 
     loadImage(path) {

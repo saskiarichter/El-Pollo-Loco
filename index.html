@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,9 +23,42 @@
     <script src="classes/coin.class.js"></script>
     <script src="js/level1.js"></script>
     <script src="js/game.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
 </head>
+
 <body onload="init()">
     <h1>El Pollo Loco</h1>
-    <canvas id="canvas" width="720" height="480"></canvas>
+    <canvas id="canvas" class="hidden" width="720" height="480"></canvas>
+    <div id="menu" class="menu">
+        <button id="navigation-button" onclick="showNavigation()">Navigation</button>
+        <button id="start-button" onclick="startGame()">Start Game</button>
+        <button id="settings-button" onclick="showSettings()">Settings</button> 
+    </div>
+    
+    <div id="navigation" class="hidden">
+        <div class="navigation-row">
+            <img src="img/10_icons/arrow-right.png" alt="arrow-right">
+            <img src="img/10_icons/arrow-left.png" alt="arrow-right">
+            <div class="space"><img src="img/10_icons/arrow-up.png" alt="arrow-right"><b>// SPACE</b></div>
+            <div class="space d"><b>D</b></div>
+        </div>
+        <div class="navigation-row">
+            <span>Go Right</span>
+            <span>Go Left</span>
+            <span>Jump</span>
+            <span>Throw Bottle</span>
+        </div>
+        
+        <img onclick="closeNavigation()" class="cross" src="img/10_icons/cross.svg" alt="cross">
+        
+    </div>
 </body>
+
 </html>

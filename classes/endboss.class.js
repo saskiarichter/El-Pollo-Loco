@@ -1,8 +1,11 @@
 class Endboss extends MovableObject {
+    world;
+    level = level1;
     x = 2000;
     y = 90;
     width = 280;
     height = 370;
+    energy = 100;
     IMAGES_WALKING = [
         'img/4_enemie_boss_chicken/1_walk/G1.png',
         'img/4_enemie_boss_chicken/1_walk/G2.png',
@@ -39,6 +42,16 @@ class Endboss extends MovableObject {
         'img/4_enemie_boss_chicken/5_dead/G25.png',
         'img/4_enemie_boss_chicken/5_dead/G26.png',
     ];
+    IMAGES_SPLASH = [
+        'img/6_salsa_bottle/bottle_rotation/bottle_splash/1_bottle_splash.png',
+        'img/6_salsa_bottle/bottle_rotation/bottle_splash/2_bottle_splash.png',
+        'img/6_salsa_bottle/bottle_rotation/bottle_splash/3_bottle_splash.png',
+        'img/6_salsa_bottle/bottle_rotation/bottle_splash/4_bottle_splash.png',
+        'img/6_salsa_bottle/bottle_rotation/bottle_splash/5_bottle_splash.png',
+        'img/6_salsa_bottle/bottle_rotation/bottle_splash/6_bottle_splash.png',
+    ];
+    hurting_sound = new Audio('audio/chicken-hurting.mp3');
+    dying_sound = new Audio('audio/chicken-dying.mp3');
 
     constructor(){
         super().loadImage('img/4_enemie_boss_chicken/1_walk/G1.png');
@@ -47,12 +60,52 @@ class Endboss extends MovableObject {
         this.loadImages(this.IMAGES_ATTACKING);
         this.loadImages(this.IMAGES_HURTING);
         this.loadImages(this.IMAGES_DYING);
+        this.loadImages(this.IMAGES_SPLASH);
         this.animate();
+        this.checkCollision();
+        this.animateCollision();
     }
 
     animate(){
         setInterval(() => {
-            this.animateImages(this.IMAGES_ALERT);
+            if (this.energy > 0) {
+                this.animateImages(this.IMAGES_ALERT);
+            }else{
+                 this.loadImage('img/4_enemie_boss_chicken/5_dead/G26.png');
+            }
+            if (this.world.character.x > 1700 && !this.isHurt() && !this.isDead()) {
+                this.animateImages(this.IMAGES_ATTACKING);
+            }
         }, 200);
+    }
+
+    checkCollision(){
+        setInterval(() => {
+            this.world.throwableObjects.forEach((bottle) => {
+                if (this.isColliding(bottle)) {
+                    if (this.energy > 0) {
+                        if (!this.isHurt()) {
+                            this.energy -= 20;
+                            this.level.endbossbar.setPercentage(this.energy);
+                            this.lastHit = new Date().getTime();
+                        }
+                    }
+                }
+            })
+        }, 110);
+    }
+
+
+    animateCollision() {
+        setInterval(() => {
+            if (this.isHurt()) {
+                this.animateImages(this.IMAGES_HURTING);
+                this.hurting_sound.play();
+            }
+            if (this.isDead() && this.energy == 0) {
+                this.animateImages(this.IMAGES_DYING);
+                this.dying_sound.play();
+            }
+        }, 110);
     }
 }

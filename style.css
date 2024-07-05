@@ -1,9 +1,109 @@
 body {
+    margin: 0;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    background-image: url('img/9_intro_outro_screens/start/startscreen03.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: bottom;
+}
+
+h1{
+    margin: 0;
+    font-size: 135px;
+    font-family: "Archivo Black", sans-serif;
+    text-align: center;
+
+    /* --- startscreen01 --- */
+    /* color: #A02209; 
+    text-shadow: 2px 2px 8px #FF8262; */
+
+    /* --- startscreen03 --- */
+    color: #A14901;
+    text-shadow: 4px 4px 8px #743600;
 }
 
 canvas {
     background-color: black;
+}
+
+.hidden{
+    display: none !important;
+}
+
+.menu{
+    display: flex;
+    gap: 30px;
+}
+
+button{
+    height: 80px;
+    width: 200px;
+    border: none;
+    border-radius: 50%;
+    color: black;
+    background-color: #da6d0e;
+    font-size: 20px;
+    font-family: "Archivo Black", sans-serif;
+    cursor: pointer;
+}
+
+#ffead7
+
+button:hover {
+    background-color: #eea96e;
+}
+
+#navigation img {
+    height: 40px;
+    width: 40px;
+}
+
+#navigation{
+    display: flex;
+    align-items: center;
+    gap: 48px;
+    background-color: #eea96e99;
+    padding: 20px 170px 20px 170px;
+    border-radius: 50%;
+}
+
+.navigation-row{
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.navigation-row span{
+    height: 40px;
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    font-family: "Archivo Black", sans-serif;
+}
+
+.space{
+    display: flex;
+    align-items: center;
+    font-size: 24px;
+    font-family: "Archivo Black", sans-serif;
+}
+
+.d{
+    height: 40px;
+    padding-left: 15px;
+}
+
+.cross{
+    margin-right: -130px;
+    border-radius: 50%;
+    padding: 4px;
+}
+
+.cross:hover{
+    background-color: #eea96e;
+    cursor: pointer;
 }
