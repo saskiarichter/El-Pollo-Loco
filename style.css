@@ -2,108 +2,171 @@ body {
     margin: 0;
     min-height: 100vh;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
     background-image: url('img/9_intro_outro_screens/start/startscreen03.jpg');
     background-repeat: no-repeat;
     background-size: cover;
     background-position: bottom;
+    font-family: "Archivo", sans-serif;
 }
 
-h1{
+#home {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h1 {
     margin: 0;
     font-size: 135px;
-    font-family: "Archivo Black", sans-serif;
+    font-weight: 900;
     text-align: center;
-
-    /* --- startscreen01 --- */
-    /* color: #A02209; 
-    text-shadow: 2px 2px 8px #FF8262; */
-
-    /* --- startscreen03 --- */
     color: #A14901;
     text-shadow: 4px 4px 8px #743600;
 }
 
 canvas {
     background-color: black;
+    display: block;
 }
 
-.hidden{
+#fullscreenContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hidden {
     display: none !important;
 }
 
-.menu{
+.startscreen {
+    background-image: url('img/9_intro_outro_screens/start/startscreen_1.png');
+    background-size: cover;
+    background-position: center;
+    width: 600px;
+    height: 350px;
     display: flex;
-    gap: 30px;
+    align-items: center;
+    justify-content: center;
 }
 
-button{
-    height: 80px;
-    width: 200px;
-    border: none;
-    border-radius: 50%;
-    color: black;
-    background-color: #da6d0e;
-    font-size: 20px;
-    font-family: "Archivo Black", sans-serif;
+.startscreen button {
+    background-color: rgba(0, 0, 0, 0.3);
+    border: solid 1px #953816;
+    border-radius: 10px;
+    box-shadow: 2px 0px 4px #743600;
+}
+
+.play-button {
+    width: 55px;
+    height: auto;
+    padding: 20px 30px 20px 30px;
+    border-radius: 10px;
     cursor: pointer;
 }
 
-#ffead7
-
-button:hover {
-    background-color: #eea96e;
+.play-button:hover {
+    transform: scale(1.1);
 }
 
-#navigation img {
-    height: 40px;
-    width: 40px;
+.navigation {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 700;
+    color: rgb(47, 21, 0);
 }
 
-#navigation{
+.navigation img {
+    height: 30px;
+    width: auto;
+}
+
+.navigate {
     display: flex;
     align-items: center;
-    gap: 48px;
-    background-color: #eea96e99;
-    padding: 20px 170px 20px 170px;
-    border-radius: 50%;
+    gap: 2px;
 }
 
-.navigation-row{
+.d {
+    padding: 1px 3px 1px 3px;
+    margin-right: 2px;
+    border: 3px solid black;
+    border-radius: 4px;
+}
+
+.info {
+    width: 80%;
+    height: 80vh;
+    padding: 30px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: solid 1px #953816;
+    border-radius: 10px;
+    box-shadow: 2px 0px 4px #743600;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    font-weight: 300;
 }
 
-.navigation-row span{
-    height: 40px;
-    display: flex;
-    align-items: center;
-    font-size: 20px;
-    font-family: "Archivo Black", sans-serif;
+.info img {
+    width: 30px;
+    height: auto;
+    margin-top: -20px;
+    margin-right: -20px;
 }
 
-.space{
-    display: flex;
-    align-items: center;
-    font-size: 24px;
-    font-family: "Archivo Black", sans-serif;
-}
-
-.d{
-    height: 40px;
-    padding-left: 15px;
-}
-
-.cross{
-    margin-right: -130px;
-    border-radius: 50%;
-    padding: 4px;
-}
-
-.cross:hover{
-    background-color: #eea96e;
+.info img:hover {
+    transform: scale(1.1);
     cursor: pointer;
+}
+
+.info a {
+    color: black;
+    font-weight: 400;
+    text-decoration: none;
+}
+
+.info a:hover {
+    color: black;
+    text-decoration: underline;
+}
+
+.close-info {
+    display: flex;
+    justify-content: flex-end;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 5px;
+    font-size: 14px;
+}
+
+footer span:hover {
+    color: #FFA001;
+    cursor: pointer;
+}
+
+
+@media(max-width: 720px) {
+    canvas {
+        width: 100%;
+    }
+}
+
+@media(max-height: 480px) {
+    canvas {
+        height: 100vh;
+    }
 }

@@ -1,5 +1,7 @@
 class Chicken extends MovableObject {
-    x = 600 + Math.random() * 1500;
+    world;
+    level = level1;
+    x = 800 + Math.random() * 2600;
     y = 355;
     width = 60;
     height = 70;
@@ -31,4 +33,5 @@ class Chicken extends MovableObject {
             this.moveLeft();
         }, 1000 / 60);
     }
+
 }

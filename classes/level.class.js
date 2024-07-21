@@ -8,7 +8,7 @@ class Level {
     coinbar;
     bottlebar;
     endbossbar;
-    level_end_x = 2000;
+    level_end_x = 3700;
 
     constructor(enemies, clouds, backgrounds, bottles, coins, lifebar, coinbar, bottlebar, endbossbar) {
         this.enemies = enemies;

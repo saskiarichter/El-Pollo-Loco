@@ -1,5 +1,5 @@
 class SmallChicken extends Chicken {
-    x = 700 + Math.random() * 1800;
+    x = 700 + Math.random() * 2900;
     y = 375;
     width = 40;
     height = 50;

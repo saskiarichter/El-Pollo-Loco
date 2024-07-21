@@ -4,7 +4,6 @@ class MovableObject extends DrawableObject{
     speedY = 0;
     accelaration = 1;
     lastHit = 0;
-    lastCollect = 0;
 
     moveRight() {
         this.x += this.speed;
@@ -27,7 +26,7 @@ class MovableObject extends DrawableObject{
         if (this instanceof ThrowableObject) { // bottle should always fall
             return true;
         }else {
-            return this.y < 220;
+            return this.y + this.height - this.offset.bottom < 420;
         }
     }
 
@@ -38,21 +37,28 @@ class MovableObject extends DrawableObject{
         this.y + this.offset.top < object.y + object.height - object.offset.bottom;
     }
 
-    isHit(){
-        let timepassed = new Date().getTime() - this.lastCollect;
-        timepassed = timepassed / 1000; // Differenz in s
-        return timepassed < 0.5;
-    }
-
     isHurt(){
         let timepassed = new Date().getTime() - this.lastHit;
         timepassed = timepassed / 1000; // Differenz in s
-        return timepassed < 2;
+        return timepassed < 1;
     }
 
     isDead(){
         let timepassed = new Date().getTime() - this.lastHit;
         timepassed = timepassed / 1000; // Differenz in s
-        return timepassed < 4;
+        return timepassed < 2;
+    }
+
+    isMuted(){
+        if (this.world.mutedSound == true) {
+            return true;
+        }
+    }
+
+    isCollapsing(){
+        this.speed = 0;
+        setInterval(() => {
+            this.loadImage(this.IMAGE_DEAD);
+        }, 10);
     }
 }

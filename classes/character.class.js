@@ -2,11 +2,12 @@ class Character extends MovableObject {
     world;
     level = level1;
     x = 0;
-    y = 30;
+    y = 230;
     width = 110;
     height = 200;
     speed = 4;
     energy = 100;
+    sleeptimer = 100;
     coinstatus = 0;
     bottlestatus = 0;
     IMAGES_STANDING = [
@@ -66,13 +67,15 @@ class Character extends MovableObject {
         'img/2_character_pepe/5_dead/D-56.png',
         'img/2_character_pepe/5_dead/D-57.png',
     ];
+    letsgo_sound = new Audio('audio/letsgo.mp3');
+    loosing_sound = new Audio('audio/noo.mp3');
     walking_sound = new Audio('audio/running.mp3');
     jumping_sound = new Audio('audio/jumping.mp3');
-    hurting_sound = new Audio('audio/hurting.mp3');
+    hurting_sound = new Audio('audio/hurt.mp3');
     dying_sound = new Audio('audio/dying.mp3');
     coin_sound = new Audio('audio/coin.mp3');
     collect_sound = new Audio('audio/collecting.mp3');
-    attack_sound = new Audio('audio/attack.mp3');
+    attack_sound = new Audio('audio/throw.mp3');
     offset = {
         top: 90,
         right: 30,
@@ -93,6 +96,7 @@ class Character extends MovableObject {
         this.checkCollisions();
     }
 
+
     controlCharacter() {
         this.animateWalk();
         this.walk();
@@ -104,18 +108,29 @@ class Character extends MovableObject {
     animateWalk() {
         setInterval(() => {
             if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT) {
+                this.sleeptimer = 100;
                 this.animateImages(this.IMAGES_WALKING);
-                this.walking_sound.play();
+                if (!this.isMuted()) {
+                    this.walking_sound.play();
+                }
             } else {
                 if (this.energy > 0) {
                     this.animateImages(this.IMAGES_STANDING);
-                } else {
-                    this.loadImage('img/2_character_pepe/5_dead/D-57.png');
+                    this.animateSleep();
                 }
                 this.walking_sound.pause();
             }
         }, 110);
     }
+
+    animateSleep() {
+        if (this.sleeptimer > 0) {
+            this.sleeptimer--;
+        } else {
+            this.animateImages(this.IMAGES_SLEEPING);
+        }
+    }
+
 
     walk() {
         setInterval(() => {
@@ -123,7 +138,7 @@ class Character extends MovableObject {
                 this.moveRight();
                 this.otherDirection = false;
             }
-            if (this.world.keyboard.LEFT && this.x > 0) {
+            if (this.world.keyboard.LEFT && this.x > -550) {
                 this.moveLeft();
                 this.otherDirection = true;
             }
@@ -144,8 +159,11 @@ class Character extends MovableObject {
         this.applyGravity();
         setInterval(() => {
             if (this.world.keyboard.UP && !this.isAboveGround() || this.world.keyboard.SPACE && !this.isAboveGround()) {
+                this.sleeptimer = 100;
                 this.speedY = 15;
-                this.jumping_sound.play();
+                if (!this.isMuted()) {
+                    this.jumping_sound.play();
+                }
             }
         }, 1000 / 60);
     }
@@ -153,9 +171,12 @@ class Character extends MovableObject {
     throwBottle() {
         setInterval(() => {
             if (this.world.keyboard.D && this.bottlestatus > 0) {
+                this.sleeptimer = 100;
                 let bottle = new ThrowableObject(this.x + 50, this.y + 100);
                 this.world.throwableObjects.push(bottle);
-                this.attack_sound.play();
+                if (!this.isMuted()) {
+                    this.attack_sound.play();
+                }
                 this.bottlestatus -= 20;
                 this.level.bottlebar.setPercentage(this.bottlestatus);
             }
@@ -168,28 +189,21 @@ class Character extends MovableObject {
             this.collideEndboss();
             this.collideCoin();
             this.collideBottle();
+        }, 30);
+        setInterval(() => {
+            this.animateCollision();
         }, 110);
-        this.animateCollision();
     }
 
     collideEnemy() {
-        this.level.enemies.forEach((enemy) => {
-            if (this.isColliding(enemy)) {
-                if (this.energy > 0) {
-                    if (!this.isHurt()) {
-                        this.energy -= 20;
-                        this.level.lifebar.setPercentage(this.energy);
-                        this.lastHit = new Date().getTime();
-                    }
-                }
-            }
-        })
-    }
-
-    collideEndboss(){
-        if (this.isColliding(this.world.endboss)) {
-            if (this.energy > 0) {
-                if (!this.isHurt()) {
+        let enemies = this.level.enemies;
+        for (let i = 0; i < enemies.length; i++) {
+            const chicken = enemies[i];
+            if (this.isColliding(chicken) && this.energy > 0 && !this.isHurt()) {
+                this.sleeptimer = 100;
+                if (this.isAboveGround()) {
+                    this.jumpOnEnemy(enemies, chicken, i);
+                } else {
                     this.energy -= 20;
                     this.level.lifebar.setPercentage(this.energy);
                     this.lastHit = new Date().getTime();
@@ -198,15 +212,38 @@ class Character extends MovableObject {
         }
     }
 
+    jumpOnEnemy(enemies, enemy, i){
+        enemy.isCollapsing();
+        this.speedY = 15;
+        if (!this.isMuted()) {
+            this.jumping_sound.play();
+        }
+        setTimeout(() => {
+            enemies.splice(i, 1);
+        }, 500);
+    }
+
+    collideEndboss() {
+        if (this.isColliding(this.world.endboss)) {
+            this.sleeptimer = 100;
+            if (this.energy > 0 && !this.isHurt()) {
+                this.energy -= 20;
+                this.level.lifebar.setPercentage(this.energy);
+                this.lastHit = new Date().getTime();
+            }
+        }
+    }
+
     collideCoin() {
         let coins = this.level.coins;
         for (let i = 0; i < coins.length; i++) {
             const coin = coins[i];
-            if (this.isColliding(coin) && this.coinstatus < 100 && !this.isHit()) {
+            if (this.isColliding(coin) && this.coinstatus < 100) {
                 this.coinstatus += 20;
                 this.level.coinbar.setPercentage(this.coinstatus);
-                this.lastCollect = new Date().getTime();
-                this.coin_sound.play();
+                if (!this.isMuted()) {
+                    this.coin_sound.play();
+                }
                 coins.splice(i, 1);
             }
         }
@@ -216,26 +253,45 @@ class Character extends MovableObject {
         let bottles = this.level.bottles;
         for (let i = 0; i < bottles.length; i++) {
             const bottle = bottles[i];
-            if (this.isColliding(bottle) && this.bottlestatus < 100 && !this.isHit()) {
+            if (this.isColliding(bottle) && this.bottlestatus < 100) {
                 this.bottlestatus += 20;
                 this.level.bottlebar.setPercentage(this.bottlestatus);
-                this.lastCollect = new Date().getTime();
-                this.collect_sound.play();
+                if (!this.isMuted()) {
+                    this.collect_sound.play();
+                }
                 bottles.splice(i, 1);
             }
         }
     }
 
     animateCollision() {
-        setInterval(() => {
-            if (this.isHurt()) {
-                this.animateImages(this.IMAGES_HURTING);
+        if (this.isHurt()) {
+            this.animateImages(this.IMAGES_HURTING);
+            if (!this.isMuted()) {
                 this.hurting_sound.play();
             }
-            if (this.isDead() && this.energy == 0) {
-                this.animateImages(this.IMAGES_DYING);
-                this.dying_sound.play();
+        }
+        if (this.isDead() && this.energy == 0) {
+            this.animateImages(this.IMAGES_DYING);
+            if (!this.isMuted()) {
+                this.loosing_sound.play();
             }
-        }, 110);
+            this.showEndScreen();
+        }
     }
+
+    showEndScreen(){
+        setTimeout(() => {
+            this.clearAllIntervals();
+            this.world.music.pause();
+            this.world.mutedSound = true;
+            let text = new Text('img/9_intro_outro_screens/game_over/game over.png', 720, 480, 0, 0);
+            this.world.text.push(text);
+            let restartButton = new Button('img/10_icons/restart-gelb.svg', 120, 210, 60, 60);
+            this.world.restartButton.push(restartButton);
+            let homeButton = new Button('img/10_icons/home-gelb.svg', 550, 210, 60, 60);
+            this.world.homeButton.push(homeButton);
+        }, 2000);
+    }
+
 }

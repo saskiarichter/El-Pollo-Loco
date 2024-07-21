@@ -6,7 +6,17 @@ class World {
     character = new Character();
     endboss = new Endboss();
     throwableObjects = [];
+    sounds = [];
+    text = [];
     level = level1;
+    restartButton = [];
+    homeButton = [];
+    fullScreenButton = new Button ('img/10_icons/fullscreen-weiß.svg', 685, 15, 20, 20);
+    musicButton = new Button('img/10_icons/music-weiß.svg', 685, 45, 20, 20);
+    soundButton = new Button('img/10_icons/sound-weiß.svg', 685, 75, 20, 20);
+    music = new Audio('audio/game-music.mp3');
+    mutedMusic = false;
+    mutedSound = false;
 
     constructor(canvas, keyboard) {
         this.ctx = canvas.getContext('2d');
@@ -14,6 +24,10 @@ class World {
         this.keyboard = keyboard;
         this.setWorld();
         this.draw();
+        this.music.play();
+        canvas.addEventListener('click', (event) => {
+            this.muteAudio(event);
+        });
     }
 
     setWorld() {
@@ -28,7 +42,7 @@ class World {
         // -- space for movable objects ---
         this.drawObjectsOnCanvas(this.level.backgrounds);
         this.drawObjectsOnCanvas(this.level.clouds);
-        this.drawObjectsOnCanvas(this.level.bottles); 
+        this.drawObjectsOnCanvas(this.level.bottles);
         this.drawObjectsOnCanvas(this.level.coins);
         this.drawOnCanvas(this.character);
         this.drawOnCanvas(this.endboss);
@@ -41,7 +55,12 @@ class World {
         this.drawOnCanvas(this.level.coinbar);
         this.drawOnCanvas(this.level.endbossbar);
         this.drawOnCanvas(this.level.bottlebar);
-        
+        this.drawOnCanvas(this.fullScreenButton);
+        this.drawOnCanvas(this.musicButton);
+        this.drawOnCanvas(this.soundButton);
+        this.drawObjectsOnCanvas(this.text);
+        this.drawObjectsOnCanvas(this.restartButton);
+        this.drawObjectsOnCanvas(this.homeButton);
 
         this.drawAgain();
     }
@@ -86,4 +105,54 @@ class World {
             self.draw();
         });
     }
+
+
+    insideButton(position, rect) {
+        return position.x > rect.x &&
+            position.x < rect.x + rect.width &&
+            position.y < rect.y + rect.height &&
+            position.y > rect.y
+    }
+
+    getMousePosition(canvas, event) {
+        let rect = canvas.getBoundingClientRect();
+        return {
+            x: event.clientX - rect.left,
+            y: event.clientY - rect.top
+        };
+    }
+
+    muteAudio(event) {
+        let mousePosition = this.getMousePosition(this.canvas, event);
+        if (this.insideButton(mousePosition, this.musicButton)) {
+            this.muteMusic();
+        } else if (this.insideButton(mousePosition, this.soundButton)) {
+            this.muteSounds();
+        }
+    }
+
+    muteMusic() {
+        if (this.mutedMusic == false) {
+            this.musicButton.img.src = 'img/10_icons/music-off-weiß.svg';
+            this.music.pause();
+            this.mutedMusic = true;
+        } else {
+            this.musicButton.img.src = 'img/10_icons/music-weiß.svg';
+            this.music.play();
+            this.mutedMusic = false;
+        }
+    }
+
+    muteSounds() {
+        if (this.mutedSound == false) {
+            this.soundButton.img.src = 'img/10_icons/sound-off-weiß.svg';
+            this.mutedSound = true;
+        } else {
+            this.soundButton.img.src = 'img/10_icons/sound-weiß.svg';
+            this.mutedSound = false;
+        }
+    }
+
+    
+
 }

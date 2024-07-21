@@ -1,7 +1,7 @@
 class Endboss extends MovableObject {
     world;
     level = level1;
-    x = 2000;
+    x = 3400;
     y = 90;
     width = 280;
     height = 370;
@@ -52,8 +52,9 @@ class Endboss extends MovableObject {
     ];
     hurting_sound = new Audio('audio/chicken-hurting.mp3');
     dying_sound = new Audio('audio/chicken-dying.mp3');
+    winning_sound = new Audio('audio/win.mp3');
 
-    constructor(){
+    constructor() {
         super().loadImage('img/4_enemie_boss_chicken/1_walk/G1.png');
         this.loadImages(this.IMAGES_WALKING);
         this.loadImages(this.IMAGES_ALERT);
@@ -66,20 +67,17 @@ class Endboss extends MovableObject {
         this.animateCollision();
     }
 
-    animate(){
+    animate() {
         setInterval(() => {
-            if (this.energy > 0) {
+            if (this.energy > 0 && this.world.character.x < 3100) {
                 this.animateImages(this.IMAGES_ALERT);
-            }else{
-                 this.loadImage('img/4_enemie_boss_chicken/5_dead/G26.png');
-            }
-            if (this.world.character.x > 1700 && !this.isHurt() && !this.isDead()) {
+            } else if (this.world.character.x > 3100 && !this.isHurt() && !this.isDead()) {
                 this.animateImages(this.IMAGES_ATTACKING);
             }
         }, 200);
     }
 
-    checkCollision(){
+    checkCollision() {
         setInterval(() => {
             this.world.throwableObjects.forEach((bottle) => {
                 if (this.isColliding(bottle)) {
@@ -100,11 +98,27 @@ class Endboss extends MovableObject {
         setInterval(() => {
             if (this.isHurt()) {
                 this.animateImages(this.IMAGES_HURTING);
-                this.hurting_sound.play();
+                if (!this.isMuted()) {
+                    this.hurting_sound.play();
+                }
             }
             if (this.isDead() && this.energy == 0) {
                 this.animateImages(this.IMAGES_DYING);
-                this.dying_sound.play();
+                if (!this.isMuted()) {
+                    this.dying_sound.play();
+                }
+                setTimeout(() => {
+                    this.clearAllIntervals();
+                    this.world.music.pause();
+                    this.world.mutedSound = true;
+                    this.winning_sound.play();
+                    let text = new Text('img/9_intro_outro_screens/win/win_1.png', 380, 100, 170, 190);
+                    this.world.text.push(text);
+                    let restartButton = new Button('img/10_icons/restart-gelb.svg', 80, 210, 60, 60);
+                    this.world.restartButton.push(restartButton);
+                    let homeButton = new Button('img/10_icons/home-gelb.svg', 590, 210, 60, 60);
+                    this.world.homeButton.push(homeButton);
+                }, 4000);
             }
         }, 110);
     }
