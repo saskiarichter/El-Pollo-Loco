@@ -10,6 +10,13 @@ class Coin extends MovableObject{
         left: 40,
     }
 
+    /**
+     * initializes the coin object
+     * 
+     * @param {string} path - image file path
+     * @param {number} x - x-coordinate for the object's position
+     * @param {number} y - y-coordinate for the object's position
+     */
     constructor(path, x, y){
         super().loadImage(path);
         this.x = x;

@@ -19,12 +19,18 @@ class Chicken extends MovableObject {
         left: 5,
     }
 
+    /**
+     * initilizes the chicken object
+     */
     constructor() {
         super().loadImage('img/3_enemies_chicken/chicken_normal/1_walk/1_w.png');
         this.loadImages(this.IMAGES_WALKING);
         this.animate();
     }
 
+    /**
+     * animates the walking of the chicken
+     */
     animate() {
         setInterval(() => {
             this.animateImages(this.IMAGES_WALKING);
@@ -33,5 +39,4 @@ class Chicken extends MovableObject {
             this.moveLeft();
         }, 1000 / 60);
     }
-
 }

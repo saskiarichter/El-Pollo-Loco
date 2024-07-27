@@ -2,7 +2,7 @@ class Character extends MovableObject {
     world;
     level = level1;
     x = 0;
-    y = 230;
+    y = 228;
     width = 110;
     height = 200;
     speed = 4;
@@ -76,6 +76,7 @@ class Character extends MovableObject {
     coin_sound = new Audio('audio/coin.mp3');
     collect_sound = new Audio('audio/collecting.mp3');
     attack_sound = new Audio('audio/throw.mp3');
+    chickenDying_sound = new Audio('audio/chicken-dying.mp3');
     offset = {
         top: 90,
         right: 30,
@@ -83,7 +84,9 @@ class Character extends MovableObject {
         left: 20,
     }
 
-
+    /**
+     * initializes a character object
+     */
     constructor() {
         super().loadImage('img/2_character_pepe/1_idle/idle/I-1.png');
         this.loadImages(this.IMAGES_STANDING);
@@ -94,9 +97,16 @@ class Character extends MovableObject {
         this.loadImages(this.IMAGES_DYING);
         this.controlCharacter();
         this.checkCollisions();
+        setTimeout(() => {
+            if (!this.isMuted()) {
+                this.letsgo_sound.play();
+            }
+        }, 3000);
     }
 
-
+    /**
+     * calls functions to control the character
+     */
     controlCharacter() {
         this.animateWalk();
         this.walk();
@@ -105,25 +115,45 @@ class Character extends MovableObject {
         this.throwBottle();
     }
 
+    /**
+     * animates character if walking or standing
+     */
     animateWalk() {
         setInterval(() => {
             if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT) {
                 this.sleeptimer = 100;
-                this.animateImages(this.IMAGES_WALKING);
-                if (!this.isMuted()) {
-                    this.walking_sound.play();
-                }
+                this.animateWalking();
             } else {
                 if (this.energy > 0) {
-                    this.animateImages(this.IMAGES_STANDING);
-                    this.animateSleep();
+                    this.animateStanding();
                 }
-                this.walking_sound.pause();
             }
         }, 110);
     }
 
-    animateSleep() {
+    /**
+     * animates walking of character 
+     */
+    animateWalking() {
+        this.animateImages(this.IMAGES_WALKING);
+        if (!this.isMuted()) {
+            this.walking_sound.play();
+        }
+    }
+
+    /**
+     * animates standing of character 
+     */
+    animateStanding() {
+        this.animateImages(this.IMAGES_STANDING);
+        this.animateSleeping();
+        this.walking_sound.pause();
+    }
+
+    /**
+     * animates sleeping of character
+     */
+    animateSleeping() {
         if (this.sleeptimer > 0) {
             this.sleeptimer--;
         } else {
@@ -131,7 +161,9 @@ class Character extends MovableObject {
         }
     }
 
-
+    /**
+     * moves character left and right
+     */
     walk() {
         setInterval(() => {
             if (this.world.keyboard.RIGHT && this.x < level1.level_end_x) {
@@ -146,6 +178,9 @@ class Character extends MovableObject {
         }, 1000 / 60);
     }
 
+    /**
+     * animates jump of character
+     */
     animateJump() {
         setInterval(() => {
             if (this.isAboveGround()) {
@@ -155,10 +190,14 @@ class Character extends MovableObject {
         }, 110);
     }
 
+    /**
+     * moves character when jumping
+     */
     jump() {
         this.applyGravity();
         setInterval(() => {
             if (this.world.keyboard.UP && !this.isAboveGround() || this.world.keyboard.SPACE && !this.isAboveGround()) {
+
                 this.sleeptimer = 100;
                 this.speedY = 15;
                 if (!this.isMuted()) {
@@ -168,11 +207,14 @@ class Character extends MovableObject {
         }, 1000 / 60);
     }
 
+    /**
+     * checks if bottles are available & initiates the bottle object
+     */
     throwBottle() {
         setInterval(() => {
             if (this.world.keyboard.D && this.bottlestatus > 0) {
                 this.sleeptimer = 100;
-                let bottle = new ThrowableObject(this.x + 50, this.y + 100);
+                let bottle = new ThrowableObject(this.x, this.y + 100, this.otherDirection);
                 this.world.throwableObjects.push(bottle);
                 if (!this.isMuted()) {
                     this.attack_sound.play();
@@ -183,38 +225,63 @@ class Character extends MovableObject {
         }, 200);
     }
 
+    /**
+     * calls functions to check collisions and animate them
+     */
     checkCollisions() {
         setInterval(() => {
             this.collideEnemy();
             this.collideEndboss();
             this.collideCoin();
             this.collideBottle();
-        }, 30);
+        }, 20);
         setInterval(() => {
             this.animateCollision();
         }, 110);
     }
 
+    /**
+     * checks and handles collisions with enemies
+     */
     collideEnemy() {
         let enemies = this.level.enemies;
+
         for (let i = 0; i < enemies.length; i++) {
             const chicken = enemies[i];
-            if (this.isColliding(chicken) && this.energy > 0 && !this.isHurt()) {
+            if (this.isCollidingEnemy(chicken)) {
                 this.sleeptimer = 100;
-                if (this.isAboveGround()) {
+                if (this.isAboveGround() && this.speedY < 0) {
                     this.jumpOnEnemy(enemies, chicken, i);
                 } else {
-                    this.energy -= 20;
-                    this.level.lifebar.setPercentage(this.energy);
-                    this.lastHit = new Date().getTime();
+                    this.getHurt();
                 }
             }
         }
     }
 
-    jumpOnEnemy(enemies, enemy, i){
-        enemy.isCollapsing();
+    /**
+     * checks if the object is colliding with an enemy
+     * 
+     * @param {object} enemy - enemy object to check for a collision
+     * @returns {boolean} - true if the object is colliding with the enemy, has energy greater than 0 and is not hurt
+     */
+    isCollidingEnemy(enemy) {
+        return this.isColliding(enemy) && this.energy > 0 && !this.isHurt()
+    }
+
+    /**
+     * handles jump on enemy 
+     * 
+     * @param {array} enemies - array of enemy objects
+     * @param {object} enemy - specific enemy object that is jumped on
+     * @param {number} i - index of the enemy in the enemies array
+     */
+    jumpOnEnemy(enemies, enemy, i) {
         this.speedY = 15;
+        enemy.isCollapsing();
+        if (!this.isMuted()) {
+            this.chickenDying_sound.play();
+        }
         if (!this.isMuted()) {
             this.jumping_sound.play();
         }
@@ -223,19 +290,31 @@ class Character extends MovableObject {
         }, 500);
     }
 
+    /**
+     * sets energy, lifebar and last hit of the character
+     */
+    getHurt() {
+        this.energy -= 20;
+        this.level.lifebar.setPercentage(this.energy);
+        this.lastHit = new Date().getTime();
+    }
+
+    /**
+     * checks and handles a collision with the endboss
+     */
     collideEndboss() {
-        if (this.isColliding(this.world.endboss)) {
+        if (this.isCollidingEnemy(this.world.endboss)) {
             this.sleeptimer = 100;
-            if (this.energy > 0 && !this.isHurt()) {
-                this.energy -= 20;
-                this.level.lifebar.setPercentage(this.energy);
-                this.lastHit = new Date().getTime();
-            }
+            this.getHurt();
         }
     }
 
+    /**
+     * checks and handles collisions with coins
+     */
     collideCoin() {
         let coins = this.level.coins;
+
         for (let i = 0; i < coins.length; i++) {
             const coin = coins[i];
             if (this.isColliding(coin) && this.coinstatus < 100) {
@@ -249,8 +328,12 @@ class Character extends MovableObject {
         }
     }
 
+    /**
+     * checks and handles collisions with bottles
+     */
     collideBottle() {
         let bottles = this.level.bottles;
+
         for (let i = 0; i < bottles.length; i++) {
             const bottle = bottles[i];
             if (this.isColliding(bottle) && this.bottlestatus < 100) {
@@ -264,6 +347,9 @@ class Character extends MovableObject {
         }
     }
 
+    /**
+     * animates the character when its hurting or dying 
+     */
     animateCollision() {
         if (this.isHurt()) {
             this.animateImages(this.IMAGES_HURTING);
@@ -273,25 +359,26 @@ class Character extends MovableObject {
         }
         if (this.isDead() && this.energy == 0) {
             this.animateImages(this.IMAGES_DYING);
-            if (!this.isMuted()) {
-                this.loosing_sound.play();
-            }
             this.showEndScreen();
         }
     }
 
-    showEndScreen(){
+    /**
+     * shows the endscreen when the game is lost
+     */
+    showEndScreen() {
         setTimeout(() => {
             this.clearAllIntervals();
+            this.walking_sound.pause();
+            this.walking_sound.currentTime = 0;
+            if (!this.isMuted()) {
+                this.loosing_sound.play();
+            }
             this.world.music.pause();
-            this.world.mutedSound = true;
             let text = new Text('img/9_intro_outro_screens/game_over/game over.png', 720, 480, 0, 0);
             this.world.text.push(text);
-            let restartButton = new Button('img/10_icons/restart-gelb.svg', 120, 210, 60, 60);
-            this.world.restartButton.push(restartButton);
-            let homeButton = new Button('img/10_icons/home-gelb.svg', 550, 210, 60, 60);
-            this.world.homeButton.push(homeButton);
+            let gameoverButtons = document.getElementById('gameover-buttons');
+            gameoverButtons.classList.remove('hidden');
         }, 2000);
     }
-
-}
+} 

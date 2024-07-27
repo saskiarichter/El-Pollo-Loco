@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" translate="no">
 
 <head>
     <meta charset="UTF-8">
@@ -14,16 +14,15 @@
     <script src="classes/chicken.class.js"></script>
     <script src="classes/small-chicken.class.js"></script>
     <script src="classes/statusbar.class.js"></script>
+    <script src="classes/keyboard.class.js"></script>
     <script src="classes/world.class.js"></script>
     <script src="classes/cloud.class.js"></script>
     <script src="classes/background.class.js"></script>
-    <script src="classes/keyboard.class.js"></script>
     <script src="classes/level.class.js"></script>
     <script src="classes/endboss.class.js"></script>
     <script src="classes/bottle.class.js"></script>
     <script src="classes/coin.class.js"></script>
     <script src="classes/text.class.js"></script>
-    <script src="classes/button.class.js"></script>
     <script src="js/level1.js"></script>
     <script src="js/game.js"></script>
 
@@ -44,8 +43,30 @@
 
         <div id="fullscreenContainer">
             <canvas id="canvas" class="hidden" width="720" height="480"></canvas>
+            <div id="overlay" class="overlay">
+                <div id="settings" class="settings hidden">
+                    <img id="fullscreenBtn" class="setting-button" src="img/10_icons/fullscreen-weiß.svg" alt="fullscreen">
+                    <img id="musicBtn" class="setting-button" src="img/10_icons/music-weiß.svg" alt="music">
+                    <img id="soundBtn" class="setting-button" src="img/10_icons/sound-weiß.svg" alt="sound">
+                </div>
+                <div id="gameover-buttons" class="gameover-buttons hidden">
+                    <img id="restartBtn" class="gameover-button" src="img/10_icons/restart-gelb.svg" alt="restart">
+                    <img id="homeBtn" class="gameover-button" src="img/10_icons/home-gelb.svg" alt="home">
+                </div>
+                <div id="mobile-buttons" class="mobile-buttons hidden">
+                    <div class="mobile-buttons-left">
+                        <img id="btnLeft" class="mobile-button" src="img/10_icons/left-white.svg" alt="left">
+                        <img id="btnRight" class="mobile-button" src="img/10_icons/right-white.svg" alt="right">
+                    </div>
+                    <div class="mobile-buttons-right">
+                        <img id="btnJump" class="mobile-button" src="img/10_icons/up-white.svg" alt="jump">
+                        <img id="btnThrow" class="mobile-button" src="img/10_icons/up-right-white.svg" alt="throw">
+                    </div>
+                </div>
+            </div>
+
         </div>
-        
+
         <div id="startscreen">
             <div class="startscreen">
                 <button onclick="startGame()">
@@ -72,6 +93,14 @@
                 </div>
             </div>
         </div>
+
+        <div class="toosmall">
+            <span>Your device is too small to play El Pollo Loco.</span>
+        </div>
+    
+        <div class="turn-device">
+            <span>Please turn your device.</span>
+        </div>
     </div>
 
     <div id="imprint" class="info hidden">
@@ -79,7 +108,7 @@
             <img onclick="closeImprint()" src="img/10_icons/cross.svg" alt="Close">
         </div>
         <h2>Impressum</h2>
-        <div>
+        <div class="imprint-text">
             <p>Angaben gemäß § 5 DDG</p>
             <p>Saskia Richter <br>
                 Scheibenbergstr.<br>

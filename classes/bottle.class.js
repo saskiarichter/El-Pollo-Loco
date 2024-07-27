@@ -1,5 +1,5 @@
 class Bottle extends MovableObject {
-    y = 370;
+    y = 365;
     width = 80;
     height = 60;
     IMG_BOTTLE = 'img/6_salsa_bottle/salsa_bottle.png';
@@ -26,9 +26,11 @@ class Bottle extends MovableObject {
         left: 35,
     }
 
+    /**
+     * initializes the bottle object
+     */
     constructor(x){
         super().loadImage(this.IMG_GROUND_LEFT);
         this.x = x;
     }
-
 }

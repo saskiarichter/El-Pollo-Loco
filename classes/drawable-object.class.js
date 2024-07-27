@@ -13,11 +13,21 @@ class DrawableObject {
         left: 50,
     }
 
+    /**
+     * loads an image 
+     * 
+     * @param {string} path - image file path
+     */
     loadImage(path) {
-        this.img = new Image(); // <img id="image"> // img = document.getElementById('image');
+        this.img = new Image();
         this.img.src = path;
     }
 
+    /**
+     * loads several images
+     * 
+     * @param {array} array - array of image file paths
+     */
     loadImages(array) {
         array.forEach((path) => {
             let img = new Image();
@@ -26,20 +36,20 @@ class DrawableObject {
         });
     }
 
+    /**
+     * draws an image to the canvas
+     * 
+     * @param {CanvasRenderingContext2D} ctx - 2D rendering context of the canvas
+     */
     draw(ctx){
         ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
     }
 
-    drawFrame(ctx) {
-        if (this instanceof Character || this instanceof Chicken || this instanceof SmallChicken || this instanceof Bottle || this instanceof Coin || this instanceof Endboss) {
-            ctx.beginPath();
-            ctx.lineWidth = "3";
-            ctx.strokeStyle = "green";
-            ctx.rect(this.x + this.offset.left, this.y + this.offset.top, this.width - this.offset.right - this.offset.left, this.height - this.offset.top - this.offset.bottom);
-            ctx.stroke();
-        }
-    }
-
+    /**
+     * animates images
+     * 
+     * @param {array} array - array of image file paths
+     */
     animateImages(array) {
         let i = this.currentImage % array.length;
         let path = array[i];
@@ -47,6 +57,9 @@ class DrawableObject {
         this.currentImage++;
     }
 
+    /**
+     * stops all Intervals
+     */
     clearAllIntervals() {
         for (let i = 1; i < 9999; i++) window.clearInterval(i);
     }

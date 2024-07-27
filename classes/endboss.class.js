@@ -6,6 +6,8 @@ class Endboss extends MovableObject {
     width = 280;
     height = 370;
     energy = 100;
+    speed = 12;
+    firstContact = false;
     IMAGES_WALKING = [
         'img/4_enemie_boss_chicken/1_walk/G1.png',
         'img/4_enemie_boss_chicken/1_walk/G2.png',
@@ -42,18 +44,14 @@ class Endboss extends MovableObject {
         'img/4_enemie_boss_chicken/5_dead/G25.png',
         'img/4_enemie_boss_chicken/5_dead/G26.png',
     ];
-    IMAGES_SPLASH = [
-        'img/6_salsa_bottle/bottle_rotation/bottle_splash/1_bottle_splash.png',
-        'img/6_salsa_bottle/bottle_rotation/bottle_splash/2_bottle_splash.png',
-        'img/6_salsa_bottle/bottle_rotation/bottle_splash/3_bottle_splash.png',
-        'img/6_salsa_bottle/bottle_rotation/bottle_splash/4_bottle_splash.png',
-        'img/6_salsa_bottle/bottle_rotation/bottle_splash/5_bottle_splash.png',
-        'img/6_salsa_bottle/bottle_rotation/bottle_splash/6_bottle_splash.png',
-    ];
     hurting_sound = new Audio('audio/chicken-hurting.mp3');
-    dying_sound = new Audio('audio/chicken-dying.mp3');
+    dying_sound = new Audio('audio/endboss-dying.mp3');
     winning_sound = new Audio('audio/win.mp3');
+    letsgo_sound = new Audio('audio/letsgo.mp3');
 
+    /**
+     * initializes the endboss object
+     */
     constructor() {
         super().loadImage('img/4_enemie_boss_chicken/1_walk/G1.png');
         this.loadImages(this.IMAGES_WALKING);
@@ -61,65 +59,166 @@ class Endboss extends MovableObject {
         this.loadImages(this.IMAGES_ATTACKING);
         this.loadImages(this.IMAGES_HURTING);
         this.loadImages(this.IMAGES_DYING);
-        this.loadImages(this.IMAGES_SPLASH);
         this.animate();
         this.checkCollision();
         this.animateCollision();
     }
 
+    /**
+     * calls functions to animate the endboss based on its distance to the character
+     */
     animate() {
+        this.checkFirstContact();
         setInterval(() => {
-            if (this.energy > 0 && this.world.character.x < 3100) {
-                this.animateImages(this.IMAGES_ALERT);
-            } else if (this.world.character.x > 3100 && !this.isHurt() && !this.isDead()) {
-                this.animateImages(this.IMAGES_ATTACKING);
+            let distance = this.x - this.world.character.x;
+            if (this.isFarAway(distance)) {
+                this.endbossIsFarAway();
+            } else if (this.isClose(distance)) {
+                this.endbossIsClose();
+            } else if (this.isBehind(distance)) {
+                this.endbossIsBehind();
             }
-        }, 200);
+        }, 100);
     }
 
+    /**
+     * checks if endboss and character have first contact
+     */
+    checkFirstContact() {
+        setInterval(() => {
+            if (this.firstContact == false && this.world.character.x > 3000) {
+                this.firstContact = true;
+            }
+        }, 100);
+    }
+
+    /**
+     * checks if the endboss is far away from the character
+     * 
+     * @param {number} distance - distance between endboss and character
+     * @returns {boolean} - true if the endboss is far away and not hurt or dead
+     */
+    isFarAway(distance) {
+        return this.energy > 0 && distance > 100
+    }
+
+    /**
+     * checks if the endboss is close to the character
+     * 
+     * @param {number} distance - distance between endboss and character
+     * @returns {boolean} - true if the endboss is in a specific distance and not hurt or dead
+     */
+    isClose(distance) {
+        return distance <= 100 && distance >= 0 && !this.isHurt() && !this.isDead()
+    }
+
+    /**
+     * checks if the endboss is behind the character
+     * 
+     * @param {number} distance - distance between endboss and character
+     * @returns {boolean} - true if the object is behind the given distance, not hurt, and not dead
+     */
+    isBehind(distance) {
+        return distance < 0 && !this.isHurt() && !this.isDead()
+    }
+
+    /**
+     * animates the endboss if the character is far away
+     */
+    endbossIsFarAway() {
+        if (this.firstContact == false) {
+            this.animateImages(this.IMAGES_ALERT);
+        } else {
+            this.animateImages(this.IMAGES_WALKING);
+            this.moveLeft();
+        }
+    }
+
+    /**
+     * animates the endboss if the character is close
+     */
+    endbossIsClose() {
+        this.otherDirection = false;
+        this.animateImages(this.IMAGES_ATTACKING);
+        this.moveLeft();
+    }
+
+    /**
+     * animates the endboss behind the character
+     */
+    endbossIsBehind() {
+        this.otherDirection = true;
+        this.animateImages(this.IMAGES_WALKING);
+        this.moveRight();
+    }
+
+    /**
+     * checks and handles the collision with a flying bottle object
+     */
     checkCollision() {
         setInterval(() => {
             this.world.throwableObjects.forEach((bottle) => {
                 if (this.isColliding(bottle)) {
-                    if (this.energy > 0) {
-                        if (!this.isHurt()) {
-                            this.energy -= 20;
-                            this.level.endbossbar.setPercentage(this.energy);
-                            this.lastHit = new Date().getTime();
-                        }
+                    bottle.flying = false;
+                    if (this.energy > 0 && !this.isHurt()) {
+                        this.energy -= 20;
+                        this.level.endbossbar.setPercentage(this.energy);
+                        this.lastHit = new Date().getTime();
                     }
                 }
             })
         }, 110);
     }
 
-
+    /**
+     * calls functions to animate the endboss when hurting, dying or the game is over
+     */
     animateCollision() {
         setInterval(() => {
             if (this.isHurt()) {
-                this.animateImages(this.IMAGES_HURTING);
-                if (!this.isMuted()) {
-                    this.hurting_sound.play();
-                }
+                this.hurting();
             }
             if (this.isDead() && this.energy == 0) {
-                this.animateImages(this.IMAGES_DYING);
-                if (!this.isMuted()) {
-                    this.dying_sound.play();
-                }
-                setTimeout(() => {
-                    this.clearAllIntervals();
-                    this.world.music.pause();
-                    this.world.mutedSound = true;
-                    this.winning_sound.play();
-                    let text = new Text('img/9_intro_outro_screens/win/win_1.png', 380, 100, 170, 190);
-                    this.world.text.push(text);
-                    let restartButton = new Button('img/10_icons/restart-gelb.svg', 80, 210, 60, 60);
-                    this.world.restartButton.push(restartButton);
-                    let homeButton = new Button('img/10_icons/home-gelb.svg', 590, 210, 60, 60);
-                    this.world.homeButton.push(homeButton);
-                }, 4000);
+                this.dying();
+                this.showEndScreen();
             }
         }, 110);
+    }
+
+    /**
+     * animates endboss when hurting
+     */
+    hurting() {
+        this.animateImages(this.IMAGES_HURTING);
+        if (!this.isMuted()) {
+            this.hurting_sound.play();
+        }
+    }
+
+    /**
+     * animates endboss when dying
+     */
+    dying() {
+        this.animateImages(this.IMAGES_DYING);
+        if (!this.isMuted()) {
+            this.dying_sound.play();
+        }
+    }
+
+    /**
+     * shows the endscreen when the game is won
+     */
+    showEndScreen() {
+        setTimeout(() => {
+            this.clearAllIntervals();
+            if (!this.isMuted()) {
+                this.winning_sound.play();
+            }
+            this.world.music.pause();
+            let text = new Text('img/9_intro_outro_screens/win/win_1.png', 380, 100, 170, 190);
+            this.world.text.push(text);
+            let gameoverButtons = document.getElementById('gameover-buttons');
+            gameoverButtons.classList.remove('hidden');
+        }, 3000);
     }
 }
